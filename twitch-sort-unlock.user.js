@@ -2,7 +2,7 @@
 // @name         Twitch Sort Unlock
 // @namespace    twitch-sort-unlock
 // @version      1.0
-// @description  Enable RECENT and VIEWER_COUNT_ASC on target categories
+// @description  Enable RECENT and VIEWER_COUNT_ASC on categories Just Chatting and Roblox.
 // @match        https://www.twitch.tv/*
 // @icon         https://icons.duckduckgo.com/ip3/twitch.tv.ico
 // @run-at       document-start
