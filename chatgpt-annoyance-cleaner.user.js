@@ -2,7 +2,7 @@
 // @name         ChatGPT Annoyance Cleaner
 // @namespace    chatgpt-annoyance-cleaner
 // @version      1.0
-// @description  Hides the rate-limit modal, restores body scroll behavior, and blocks wheel event propagation on chatgpt.com
+// @description  Hides the rate-limit modal, restores body scroll behavior, and blocks wheel event propagation.
 // @match        https://chatgpt.com/*
 // @icon         https://icons.duckduckgo.com/ip3/chatgpt.com.ico
 // @grant        none
