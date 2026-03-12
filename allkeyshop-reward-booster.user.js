@@ -11,6 +11,7 @@
 // @match        https://www.cdkeypt.pt/reward-program/*
 // @match        https://www.cdkeynl.nl/reward-program/*
 // @icon         https://icons.duckduckgo.com/ip3/allkeyshop.com.ico
+// @grant        unsafeWindow
 // @run-at       document-end
 // ==/UserScript==
 
@@ -24,8 +25,8 @@
             de: 'Erweiterung aktivieren',
             es: 'Activar extensión',
             it: 'Abilita estensione',
-            nl: 'Extensie inschakelen',
-            pt: 'Ativar extensão'
+            pt: 'Ativar extensão',
+            nl: 'Extensie inschakelen'
         },
         extensionEnabled: {
             en: 'Extension enabled',
@@ -33,8 +34,8 @@
             de: 'Erweiterung aktiviert',
             es: 'Extensión activada',
             it: 'Estensione abilitata',
-            nl: 'Extensie ingeschakeld',
-            pt: 'Extensão ativada'
+            pt: 'Extensão ativada',
+            nl: 'Extensie ingeschakeld'
         },
         siteFunctionUnavailable: {
             en: 'Site function not available',
@@ -42,8 +43,8 @@
             de: 'Seitenfunktion nicht verfügbar',
             es: 'Función del sitio no disponible',
             it: 'Funzione del sito non disponibile',
-            nl: 'Sitefunctie niet beschikbaar',
-            pt: 'Função do site não disponível'
+            pt: 'Função do site não disponível',
+            nl: 'Sitefunctie niet beschikbaar'
         }
     };
 
@@ -53,26 +54,30 @@
         return translations[key]?.[locale] || translations[key]?.en || key;
     }
 
-    function interceptExtensionXHR() {
-        const origOpen = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function(method, url) {
-            if (url && url.endsWith("?action=set_user_extension_enabled")) {
-                this.addEventListener('load', function() {
-                    if (this.status === 200 && this.responseText.trim() === "ok") {
-                        location.reload();
-                    }
-                });
-            }
-            return origOpen.apply(this, arguments);
-        };
-    }
-
-    function enableExtension() {
+    async function enableExtension() {
         if (typeof unsafeWindow.confirmExtensionEnabled !== "function") {
             alert(getTranslation('siteFunctionUnavailable'));
             return;
         }
-        interceptExtensionXHR();
+
+        const targetUrl = unsafeWindow.__site?.ajaxUrl + '?action=set_user_extension_enabled';
+        const origFetch = unsafeWindow.fetch;
+
+        unsafeWindow.fetch = async function(input, init) {
+            const url = typeof input === "string" ? input : input?.url;
+            const response = await origFetch.apply(this, arguments);
+
+            if (url === targetUrl) {
+                const text = await response.clone().text();
+                if (response.status === 200 && text.trim() === "ok") {
+                    unsafeWindow.fetch = origFetch;
+                    location.reload();
+                }
+            }
+
+            return response;
+        };
+
         unsafeWindow.confirmExtensionEnabled();
     }
 
